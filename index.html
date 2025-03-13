@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Streaming Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a8a5e6;
+            --dark: #2d2d2d;
+            --light: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+           background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: var(--light);
+            height: 100vh;
+            width: 100%;
+        }
+
+        .light-theme {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: var(--dark);
+        }
+
+        .container {
+            
+           
+            margin: 0 auto;
+            width: 100vw;
+            height: 100vh;
+            padding: 0;
+        }
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            height:10%;
+            /*position: sticky;
+            flex-wrap: wrap;
+            gap: 1rem;
+            flex-direction:row;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding: 0 1rem;*/
+            justify-content:center;
+            border-radius: 30px;
+background: none;
+        }
+
+        #search {
+          width: 80%;
+          height: 50px fixed;
+            /*flex: 1 1 300px;
+            min-width: 250px;
+            padding: 1px 0px;
+            font-size: 0.95rem;*/
+            border-radius: 30px;
+            border: 2px solid var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+            color: inherit;
+            transition: all 0.3s ease;
+            order: 1;
+        }
+
+        #search:focus {
+            outline: none;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        #theme-toggle {
+            flex: 0 0 auto;
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: none;
+            background: linear-gradient(45deg, var(--primary), #a4508b);
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            order: 2;
+        }
+
+        #theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Poster Container */
+        .poster-container {
+          width: 100vw;
+          height:100%;
+            
+           grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 3rem;
+            padding-top: 1rem;
+            overflow: scroll;
+            margin: 0;
+            
+        }
+
+        .poster {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            /*cursor: pointer;*/
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            aspect-ratio: 2/3;
+        }
+
+        .poster:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .poster::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.8) 100%);
+            z-index: 1;
+        }
+
+        .poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .poster:hover img {
+            transform: scale(1.05);
+        }
+
+        .poster h3 {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            font-size: 1.5rem;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.3s ease;
+        }
+
+        .poster:hover h3 {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Slide Styles */
+        .slide {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            padding: 2rem;
+            overflow-y: auto;
+            z-index: 1000;
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide.closing {
+            animation: slideOut 0.3s ease forwards;
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+        }
+
+        .back-btn {
+           /* position: fixed;
+            top: 2rem;
+            right: 2rem;*/
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            background: var(--primary);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .video-container {
+            margin-top: 4rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+
+        .video {
+            position: relative;
+            height: 200px;
+            background: #333;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .video:hover {
+            transform: translateY(-5px);
+        }
+
+        .video::before {
+            content: '▶';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .video::after {
+            content: attr(data-episode);
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0rem;
+            }
+
+            .navbar {
+                flex-direction: row;
+                align-items: stretch;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+                background: transparent;
+                position: sticky;
+                top:0;
+                right: 0;
+                padding: 0 0.5rem;
+                z-index: 100;
+                padding-top: 1rem;
+                
+            }
+            h1{
+              position: none;
+            }
+
+            #search {
+                flex: 1 1 100%;
+                min-width: unset;
+                width: 100%;
+                height: 50px;
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+
+            }
+
+            #theme-toggle {
+                width: 100%;
+                text-align: center;
+                padding: 12px 15px;
+            }
+
+            .poster-container{
+               grid-template-columns:px 1fr;
+               width: 100%;
+               height: 92%;
+               gap:3rem;
+               margin: 0;
+               padding-top: 6rem;
+            }
+
+            .poster {
+                aspect-ratio: 2/3;
+                width: 100%;
+                height: 300px;
+                margin-bottom: 2rem;
+            }
+            
+            .poster img {
+                min-height: 600px;
+            }
+
+            .poster h3 {
+                font-size: 1.2rem;
+                bottom: 1rem;
+                left: 1rem;
+            }
+
+            .slide {
+                padding: 1rem;
+            }
+
+            .back-btn {
+                top: 1rem;
+                right: 1rem;
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+
+            .video-container {
+                grid-template-columns: 1fr;
+                padding: 0;
+                margin-top: 2rem;
+            }
+
+            .video {
+                height: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #theme-toggle span {
+                display: none;
+            }
+            
+            #theme-toggle {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                padding: 0;
+                margin: 0 auto;
+            }
+
+            #search {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .poster img {
+                min-height: 600px;
+            }
+
+            .video::before {
+                font-size: 2rem;
+            }
+
+            .video::after {
+                font-size: 1rem;
+            }
+        }
+        
+        
+        .sticky{
+          width: 100%;
+          height: 10%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          
+        }
+        .hh{
+          width: 100%; 
+          height: 92%;
+          padding: 0.5rem;
+         padding-top: 2rem;
+          overflow: scroll;
+        }
+        .poster{
+          width: 100%;
+          height: 600px;
+        }
+        .navbar{
+          background: none;
+        }
+    </style>
+</head>
+<body>
+ <div class="container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <input type="search" id="search" placeholder="Search anime...">
+            <button id="theme-toggle">🌙</button>
+        </nav>
+
+        <!-- Poster Container -->
+        <div class="poster-container hh">
+            <div class="poster" onclick="showSlide('slide1')">
+                <img src="solo leveling.png" alt="Solo Leveling">
+                <h3>Solo Leveling Season 2</h3>
+            </div>
+            <div class="poster" onclick="showSlide('slide2')">
+                <img src="hero academia.png" alt="Hero Academia">
+                <h3>Hero Academia</h3>
+            </div>
+            <div class="poster" onclick="showSlide('slide3')">
+                <img src="Attack on Titan.jpg" alt="Attack on Titan">
+                <h3>Attack on Titan</h3>
+            </div>
+        </div>
+
+        <!-- Slides -->
+        <div id="slide1" class="slide">
+          <div class="sticky">
+             <h1>Solo Leveling</h1>
+             <div class="back-btn" onclick="hideSlides()">✖️</div>
+
+            </div>
+            <div class="video-container">
+                <div class="video" data-episode="Episode 1"></div>
+                <div class="video" data-episode="Episode 2"></div>
+                <div class="video" data-episode="Episode 3"></div>
+                <div class="video" data-episode="Episode 4"></div>
+                <div class="video" data-episode="Episode 5"></div>
+                <div class="video" data-episode="Episode 6"></div>
+                <div class="video" data-episode="Episode 7"></div>
+                <div class="video" data-episode="Episode 8"></div>
+                <div class="video" data-episode="Episode 9"></div>
+                <div class="video" data-episode="Episode 10"></div>
+                <div class="video" data-episode="Episode 11"></div>
+                <div class="video" data-episode="Episode 12"></div>
+
+
+
+            </div>
+        </div>
+
+        <div id="slide2" class="slide">
+                   <div class="sticky">
+             <h1>hero academia</h1>
+             <div class="back-btn" onclick="hideSlides()">✖️</div>
+
+            </div>
+
+            <div class="video-container">
+                <div class="video" data-episode="Episode 1"></div>
+                <div class="video" data-episode="Episode 2"></div>
+                <div class="video" data-episode="Episode 3"></div>
+            </div>
+        </div>
+
+        <div id="slide3" class="slide">
+                  <div class="sticky">
+             <h1>Attack on Titan</h1>
+             <div class="back-btn" onclick="hideSlides()">✖️</div>
+
+            </div>
+
+            <div class="video-container">
+                <div class="video" data-episode="Episode 1"></div>
+                <div class="video" data-episode="Episode 2"></div>
+                <div class="video" data-episode="Episode 3"></div>
+            </div>
+        </div>
+    </div>
+ <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {            document.body.classList.toggle('light-theme');
+            themeToggle.textContent = document.body.classList.contains('light-theme') ?
+              '🌙' :
+              '🌞';
+
+            themeToggle.style.background = document.body.classList.contains('light-theme') ?
+              'linear-gradient(45deg, #f0f0f0, #e0e0e0)' :
+              'linear-gradient(45deg, var(--primary), #a4508b)';
+            });
+
+            // Search Functionality
+            const search = document.getElementById('search');
+            const posters = document.querySelectorAll('.poster');
+
+            search.addEventListener('input', (e) => {
+              const searchTerm = e.target.value.toLowerCase();
+              posters.forEach(poster => {
+                const title = poster.querySelector('h3').textContent.toLowerCase();
+                poster.style.display = title.includes(searchTerm) ? 'block' : 'none';
+              });
+            });
+
+            // Slide Functions
+            function showSlide(slideId) {
+              document.querySelectorAll('.slide').forEach(slide => slide.style.display = 'none');
+              document.querySelector('.poster-container').style.display = 'none';
+              document.querySelector('.poster').style.height="500px"
+
+              document.getElementById(slideId).style.display = 'block';
+            }
+
+            function hideSlides() {
+              location.reload();
+
+              document.querySelectorAll('.slide').forEach(slide => slide.style.display = 'none');
+              let p =document.querySelector('.poster-container')
+              
+              p.style.display='flex'
+              p.style.width='100%'
+              p.style.height='100%'
+              p.style.flexDirection='column'
+            }
+            </script> 
+</body> 
+</html>
